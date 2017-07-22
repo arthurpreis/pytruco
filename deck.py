@@ -78,7 +78,7 @@ class Deck(Card):
             if self.is_empty(): 
                 break   # break if out of cards
             card = self.draw()           # take the top card
-            hand.add(card)              # add the card to the hand
+            hand.append(card)              # add the card to the hand
         #TODO: juntar com a funcao draw e coloque parametro de n de cartas
     
 class Hand(Deck):
