@@ -1,14 +1,41 @@
 from deck import Deck
 from deck import Card
 from deck import Hand
+from deck import Stack
 
-deck = Deck('truco') #criar e embaralhar o baralho está ok
-deck.shuffle()        
-print(deck)
+cardA = Card(0,0)
+cardB = Card(0,1)
+cardC = Card(0,2)
 
-hand = Hand("alice") #criar uma mão p um jogador tbm
-deck.deal([hand], 5) #retira cartas do baralho e vai pra mao
-print(hand) 
+stack1 = Stack()
+stack2 = Stack()
+deck = Deck()
 
-print(deck[4]) #nao indexaveis!
-print(hand[0])
+#print('stack1: \n' + str(stack1) + '\n')
+#print('stack2: \n' + str(stack2) + '\n')
+
+stack1.add_card(cardA)
+stack1.add_card(cardB)
+stack1.add_card(cardC)
+
+stack1.shuffle()
+#print('stack1: \n' + str(stack1) + '\n')
+#print('stack2: \n' + str(stack2) + '\n')
+
+#stack1.move_card(stack2, 0)
+
+#print('stack1: \n' + str(stack1) + '\n')
+#print('stack2: \n' + str(stack2) + '\n')
+
+#stack1.move_card(deck,0)
+
+#stack1.order()
+
+deck.shuffle()
+print(str(deck))
+
+deck.order()
+print(str(deck))
+
+deck.order('suit')
+print(str(deck))
