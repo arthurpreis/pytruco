@@ -125,21 +125,19 @@ class Stack():
     
     def empty(self):
         self.cards = []
-    
-    def draw_card(self, number = 1, index = -1):
-        if number == 1:           
-            return self.cards.pop(index)
-        elif number > 1:
-            cards = []
-            for i in range(number):
-                cards.append(self.cards.pop())
-            return cards
-    
+        
     def move_card(self, target, index = -1):
         card = self.cards.pop(index)
         target.add_card(card)
         #TODO: mover fatias
         
+    def draw_cards(self, target, number):
+        for i in range(number):
+           self.cards.append(target.cards.pop())
+    
+    def pop(self):
+        return self.cards.pop()
+    
     def order(self, mode = 'rank'):
         if (mode == 'rank'):
             self.cards = sorted(self.cards, key=lambda card: card.rank)
@@ -149,14 +147,9 @@ class Stack():
 class Deck(Stack):
     def __init__(self):
         self.cards = []
+        self.new_deck()
+    
+    def new_deck(self):
         for suit in range(4):
             for rank in range(0,10):
                 self.cards.append(Card(suit,rank))
-    
-    def deal(self, hand, num_cards=3):
-        for i in range(num_cards):
-            if self.is_empty(): 
-                break   # break if out of cards
-            card = self.draw()           # take the top card
-            hand.append(card)              # add the card to the hand
-        #TODO: juntar com a funcao draw e coloque parametro de n de cartas
