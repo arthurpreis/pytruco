@@ -6,4 +6,6 @@ from game import Player
 from game import Mesa
 
 game = Game()
-game.game_tento()
+while True:
+    game.game_tento()
+    game.tento_end = False

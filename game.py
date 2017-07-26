@@ -15,7 +15,7 @@ class Game():
 
         self.current_player = self.players[0]
         self.winning_player = self.players[0]
-        self.round_end = False
+        self.tento_end = False
 
     def print_score(self):
         for player in self.players:
@@ -55,7 +55,7 @@ class Game():
             self.winning_player = player
         player.play_card(play, mesa)
         print('Mesa: ' + str(mesa))
-        print('Winning player: ' + self.winning_player.name + '\n')
+#        print('Winning player: ' + self.winning_player.name + '\n')
 
     def beats(self, stack, played_card):
         if stack.is_empty():
@@ -85,15 +85,18 @@ class Game():
     def evaluate_round(self):
         for player in self.players:
             if player.is_winning:
-                print(player.name + ' ganhou\n')
+                #print(player.name + ' ganhou\n')
                 if self.rodada == 0:
                     player.won_first = True
+                    print(player.name + ' ganhou a 1a rodada \n')
                     self.check_end()
                 elif self.rodada == 1:
                     player.won_second = True
+                    print(player.name + ' ganhou a 2a rodada \n')
                     self.check_end()
                 elif self.rodada == 2:
                     player.won_third = True
+                    print(player.name + ' ganhou a 3a rodada \n')
                     self.check_end()
         for player in self.players:
             player.is_winning = False
@@ -101,14 +104,17 @@ class Game():
     def check_end(self):
         for player in self.players:
             if player.won_first and player.won_second:
-                self.end_round(player)
+              #  print('aaaaaaaaaaaaa \n')
+                self.end_tento(player)
             elif player.won_first and player.won_third:
-                self.end_round(player)
+              #  print('bbbbbbbbb \n')
+                self.end_tento(player)
             elif player.won_second and player.won_third:
-                self.end_round(player)
+               # print('cccccccccc \n')
+                self.end_tento(player)
 
-    def end_round(self, winning_player):
-        self.round_end = True
+    def end_tento(self, winning_player):
+        self.tento_end = True
         winning_player.score += 1
         self.current_player = winning_player
         for player in self.players:
@@ -118,8 +124,10 @@ class Game():
     def game_tento(self):
         self.rodada = 0
         self.deal_cards()
-        while not self.round_end:
+        while (self.rodada <= 2) and not self.tento_end:
+            print(str(self.rodada + 1)+'a rodada\n')
             self.game_round()
+        self.print_score()
 
 class Player():
     def __init__(self, name = ''):
