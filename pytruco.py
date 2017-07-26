@@ -7,5 +7,4 @@ from game import Mesa
 
 game = Game()
 while True:
-    game.game_tento()
-    game.tento_end = False
+    game.game_mao()

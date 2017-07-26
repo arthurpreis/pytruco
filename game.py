@@ -118,7 +118,7 @@ class Game():
         winning_player.score += 1
         self.current_player = winning_player
         for player in self.players:
-            player.reset_win_flag
+            player.reset_win_flag()
         self.rodada = 0
 
     def game_tento(self):
@@ -128,6 +128,14 @@ class Game():
             print(str(self.rodada + 1)+'a rodada\n')
             self.game_round()
         self.print_score()
+        
+
+    def game_mao(self):
+        for player in self.players:
+            if player.won_game():
+                return
+        self.tento_end = False
+        self.game_tento()
 
 class Player():
     def __init__(self, name = ''):
@@ -153,6 +161,12 @@ class Player():
         self.won_first = False
         self.won_second = False
         self.won_third = False
+
+    def won_game(self):
+        if self.score >= 12:
+            return True
+        else:
+            return False
 
 class Mesa(Stack):
     def __init__(self):
