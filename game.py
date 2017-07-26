@@ -10,12 +10,11 @@ class Game():
         self.players = []
         self.players.append(Player('Player 1'))
         self.players.append(Player('Player 2'))
-        self.players.append(Player('Player 3'))
-        self.players.append(Player('Player 4'))
-        self.winning_player = self.players[0]
-        self.current_player = self.players[0]
+#        self.players.append(Player('Player 3'))
+#        self.players.append(Player('Player 4'))
 
-        self.rodada = 0
+        self.current_player = self.players[0]
+        self.winning_player = self.players[0]
         self.round_end = False
 
     def print_score(self):
@@ -35,16 +34,18 @@ class Game():
 
         #self.mesa.vira = self.deck.pop() #só no truco paulista
     def game_round(self):
+        self.mesa.empty()
         play_count = 0
         while play_count < len(self.players):
             self.player_action(self.current_player, self.mesa, self.players)
             self.next_player()
             play_count += 1
-        print('fim de rodada')
-        #self.evaluate_round()
+        print('fim de rodada \n')
+        self.evaluate_round()
+        self.rodada += 1
 
     def player_action(self, player, mesa, other_players):
-        print(player.name + ' cards: \n')
+        print(player.name + ' cards:')
         print(str(player.hand))
         play = int(input(player.name + "'s turn:")) - 1
         if self.beats(mesa, player.hand[play]):
@@ -54,7 +55,7 @@ class Game():
             self.winning_player = player
         player.play_card(play, mesa)
         print('Mesa: ' + str(mesa))
-        print('Winning player: ' + self.winning_player.name)
+        print('Winning player: ' + self.winning_player.name + '\n')
 
     def beats(self, stack, played_card):
         if stack.is_empty():
@@ -81,9 +82,44 @@ class Game():
     def current_name(self):
         print(self.current_player.name)
 
-    def evaluate_round():
+    def evaluate_round(self):
         for player in self.players:
+            if player.is_winning:
+                print(player.name + ' ganhou\n')
+                if self.rodada == 0:
+                    player.won_first = True
+                    self.check_end()
+                elif self.rodada == 1:
+                    player.won_second = True
+                    self.check_end()
+                elif self.rodada == 2:
+                    player.won_third = True
+                    self.check_end()
+        for player in self.players:
+            player.is_winning = False
 
+    def check_end(self):
+        for player in self.players:
+            if player.won_first and player.won_second:
+                self.end_round(player)
+            elif player.won_first and player.won_third:
+                self.end_round(player)
+            elif player.won_second and player.won_third:
+                self.end_round(player)
+
+    def end_round(self, winning_player):
+        self.round_end = True
+        winning_player.score += 1
+        self.current_player = winning_player
+        for player in self.players:
+            player.reset_win_flag
+        self.rodada = 0
+
+    def game_tento(self):
+        self.rodada = 0
+        self.deal_cards()
+        while not self.round_end:
+            self.game_round()
 
 class Player():
     def __init__(self, name = ''):
@@ -102,7 +138,7 @@ class Player():
         self.hand.move_card(mesa, index)
 
     def draw_cards(self, target, number):
-            self.hand.draw_cards(target,number)
+        self.hand.draw_cards(target,number)
 
     def reset_win_flag(self):
         self.is_winning = False
