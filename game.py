@@ -17,6 +17,11 @@ class Game():
         self.winning_player = self.players[0]
         self.tento_end = False
 
+        self.truco_flag = False
+        self.seis_flag = False
+        self.nove_flag = False
+        self.doze_flag = False
+
     def print_score(self):
         for player in self.players:
             print(player.name + ' :' + str(player.score))
@@ -47,7 +52,8 @@ class Game():
     def player_action(self, player, mesa, other_players):
         print(player.name + ' cards:')
         print(str(player.hand))
-        play = int(input(player.name + "'s turn:")) - 1
+        play = self.parse_player_input() - 1
+
         if self.beats(mesa, player.hand[play]):
             for other_player in other_players:
                 other_player.is_winning = False
@@ -68,16 +74,10 @@ class Game():
         return True
 
     def next_player(self):
-        if self.mesa.is_empty():
-            for player in self.players:
-                if player.is_winning:
-                    self.current_player = player
-
-        else:
-            index = self.players.index(self.current_player)
-            index += 1
-            index = index % len(self.players)
-            self.current_player = self.players[index]
+        index = self.players.index(self.current_player)
+        index += 1
+        index = index % len(self.players)
+        self.current_player = self.players[index]
 
     def current_name(self):
         print(self.current_player.name)
@@ -85,6 +85,7 @@ class Game():
     def evaluate_round(self):
         for player in self.players:
             if player.is_winning:
+                self.current_player = player
                 #print(player.name + ' ganhou\n')
                 if self.rodada == 0:
                     player.won_first = True
@@ -115,7 +116,7 @@ class Game():
 
     def end_tento(self, winning_player):
         self.tento_end = True
-        winning_player.score += 1
+        winning_player.score += self.tento_value()
         self.current_player = winning_player
         for player in self.players:
             player.reset_win_flag()
@@ -128,7 +129,6 @@ class Game():
             print(str(self.rodada + 1)+'a rodada\n')
             self.game_round()
         self.print_score()
-        
 
     def game_mao(self):
         for player in self.players:
@@ -136,6 +136,32 @@ class Game():
                 return
         self.tento_end = False
         self.game_tento()
+
+    def tento_value(self):
+        if self.truco_flag:
+            return 3
+        elif self.seis_flag:
+            return 6
+        elif self.nove_flag:
+            return 9
+        elif self.doze_flag:
+            return 12
+        else:
+            return 1
+
+    def reset_truco_flags(self):
+        self.truco_flag = False
+        self.seis_flag = False
+        self.nove_flag = False
+        self.doze_flag = False
+
+    def parse_player_input(self):
+        s = input()
+        if int(s) == 1 or int(s) == 2 or int(s) == 3:
+            return int(s)
+#       elif str(s) == 't' or str(s) == 'T':
+        else:
+            print('invalid input')
 
 class Player():
     def __init__(self, name = ''):
