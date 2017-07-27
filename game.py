@@ -43,7 +43,7 @@ class Game():
         play_count = 0
         while play_count < len(self.players):
             self.player_action(self.current_player, self.mesa, self.players)
-            self.next_player()
+            self.current_player = self.next_player(self.current_player)
             play_count += 1
         print('fim de rodada \n')
         self.evaluate_round()
@@ -51,7 +51,8 @@ class Game():
 
     def player_action(self, player, mesa, other_players):
         print(player.name + ' cards:')
-        print(str(player.hand))
+        #print(str(player.hand))
+        player.print_hand()
         play = self.parse_player_input() - 1
 
         if self.beats(mesa, player.hand[play]):
@@ -73,11 +74,11 @@ class Game():
                 break
         return True
 
-    def next_player(self):
-        index = self.players.index(self.current_player)
+    def next_player(self, current_player):
+        index = self.players.index(current_player)
         index += 1
         index = index % len(self.players)
-        self.current_player = self.players[index]
+        return self.players[index]
 
     def current_name(self):
         print(self.current_player.name)
@@ -159,10 +160,20 @@ class Game():
         s = input()
         if int(s) == 1 or int(s) == 2 or int(s) == 3:
             return int(s)
-#       elif str(s) == 't' or str(s) == 'T':
+        elif str(s) == 't' or str(s) == 'T':
+            self.ask_truco()
+            self.parse_player_input()
         else:
             print('invalid input')
-
+            
+    def ask_truco(self):
+        self.current_player.has_accepted = True
+        ask_player = self.next_player(self.current_player)
+        if ask_player.accept_truco():
+            self.truco_flag = True
+        else:
+            self.end_tento(self.current_player)
+            
 class Player():
     def __init__(self, name = ''):
         self.hand = Stack()
@@ -176,6 +187,8 @@ class Player():
         self.won_second = False
         self.won_third = False
 
+        self.has_accepted = False
+        
     def play_card(self, index, mesa):
         self.hand.move_card(mesa, index)
 
@@ -190,6 +203,19 @@ class Player():
 
     def won_game(self):
         if self.score >= 12:
+            return True
+        else:
+            return False
+            
+    def print_hand(self):
+        for card in self.hand:
+            print(str(self.hand.index(card) + 1) + ': ' +
+                str(card))
+
+    def accept_truco(self):
+        s = str(input('Aceita Truco?'))
+        
+        if (s == 'y') or (s == 'Y'):
             return True
         else:
             return False

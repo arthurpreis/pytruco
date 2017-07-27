@@ -144,6 +144,9 @@ class Stack():
         elif (mode == 'suit'):
             self.cards = sorted(self.cards, key=lambda card: card.suit)
         
+    def index(self, obj):
+        return self.cards.index(obj)
+        
 class Deck(Stack):
     def __init__(self):
         self.cards = []
