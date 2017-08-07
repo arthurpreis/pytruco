@@ -1,6 +1,7 @@
-from deck import Stack
-from deck import Card
+from stack import Stack
+from card import Card
 from deck import Deck
+from player import Player
 
 class Game():
     def __init__(self):
@@ -53,9 +54,13 @@ class Game():
         print(player.name + ' cards:')
         #print(str(player.hand))
         player.print_hand()
-        play = self.parse_player_input() - 1
-
-        if self.beats(mesa, player.hand[play]):
+        while True:
+            try:
+                play = self.parse_player_input()
+                break
+            except InvalidInput:
+                print('Invalid Input, try again')
+        if self.beats(mesa, player.hand[play - 1]):
             for other_player in other_players:
                 other_player.is_winning = False
             player.is_winning = True
@@ -158,14 +163,17 @@ class Game():
 
     def parse_player_input(self):
         s = input()
-        if int(s) == 1 or int(s) == 2 or int(s) == 3:
-            return int(s)
-        elif str(s) == 't' or str(s) == 'T':
-            self.ask_truco()
-            self.parse_player_input()
+        valid_inputs = ['1', '2', '3', 't', 'y', 'n', 'f', 'T', 'Y', 'N', 'F']
+        if s in valid_inputs:
+            #print('valid input')
+            if (s == '1') or (s == '2') or (s == '3'):
+                return int(s)
+            else:
+                return s
         else:
-            print('invalid input')
-            
+            #print('invalid input')
+            raise InvalidInput
+
     def ask_truco(self):
         self.current_player.has_accepted = True
         ask_player = self.next_player(self.current_player)
@@ -173,52 +181,7 @@ class Game():
             self.truco_flag = True
         else:
             self.end_tento(self.current_player)
-            
-class Player():
-    def __init__(self, name = ''):
-        self.hand = Stack()
-        self.name = name
-        self.score = 0
-        self.round_pts = 0
-        self.turn = False
-        self.is_winning = False
 
-        self.won_first = False
-        self.won_second = False
-        self.won_third = False
-
-        self.has_accepted = False
-        
-    def play_card(self, index, mesa):
-        self.hand.move_card(mesa, index)
-
-    def draw_cards(self, target, number):
-        self.hand.draw_cards(target,number)
-
-    def reset_win_flag(self):
-        self.is_winning = False
-        self.won_first = False
-        self.won_second = False
-        self.won_third = False
-
-    def won_game(self):
-        if self.score >= 12:
-            return True
-        else:
-            return False
-            
-    def print_hand(self):
-        for card in self.hand:
-            print(str(self.hand.index(card) + 1) + ': ' +
-                str(card))
-
-    def accept_truco(self):
-        s = str(input('Aceita Truco?'))
-        
-        if (s == 'y') or (s == 'Y'):
-            return True
-        else:
-            return False
 
 class Mesa(Stack):
     def __init__(self):
