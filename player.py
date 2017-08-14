@@ -39,9 +39,21 @@ class Player():
                 str(card))
 
     def accept_truco(self):
-        s = str(input('Aceita Truco?'))
+        s = str(input(self.name + ', aceita Truco? \n'))
 
-        if (s == 'y') or (s == 'Y'):
+        if (s in ['s', 'S', 'y', 'Y']) :
             return True
         else:
             return False
+
+    def trucar(self, other_players):
+        for player in other_players:
+            player.has_accepted = False
+        self.has_accepted = True
+        
+        for player in other_players:
+            if player.accept_truco():
+                player.has_accepted = True
+                print(player.name + ' aceitou \n')
+            else:
+                print(player.name + ' não aceitou \n')

@@ -38,12 +38,13 @@ class Game():
         for player in self.players:
             player.draw_cards(self.deck,3)
 
-        #self.mesa.vira = self.deck.pop() #só no truco paulista
     def game_round(self):
         self.mesa.empty()
         play_count = 0
         while play_count < len(self.players):
-            self.player_action(self.current_player, self.mesa, self.players)
+            #other_players = self.players.remove(self.current_player)
+            self.player_action(self.current_player, 
+                                self.mesa, self.players)
             self.current_player = self.next_player(self.current_player)
             play_count += 1
         print('fim de rodada \n')
@@ -53,19 +54,23 @@ class Game():
     def player_action(self, player, mesa, other_players):
         print(player.name + ' cards:')
         #print(str(player.hand))
-        player.print_hand()
-        while True:
+        valid_move = False
+        while not valid_move:
             try:
-                play = self.parse_player_input()
-                break
-            except InvalidInput:
-                print('Invalid Input, try again')
-        if self.beats(mesa, player.hand[play - 1]):
-            for other_player in other_players:
-                other_player.is_winning = False
-            player.is_winning = True
-            self.winning_player = player
-        player.play_card(play, mesa)
+                player.print_hand()
+                play = self.filter_input(player, mesa)
+                if (play in ['1', '2', '3']):
+                    card_index = int(play) - 1
+                    if card_index > len(player.hand):
+                        print('Invalid index /n')
+                    else:
+                        self.play_card(player, mesa, other_players, 
+                                        card_index)    
+                        valid_move = True
+                elif (play in ['t','T']):
+                    player.trucar(other_players)
+            except:
+                pass
         print('Mesa: ' + str(mesa))
 #        print('Winning player: ' + self.winning_player.name + '\n')
 
@@ -127,6 +132,7 @@ class Game():
         for player in self.players:
             player.reset_win_flag()
         self.rodada = 0
+        self.reset_truco_flags()
 
     def game_tento(self):
         self.rodada = 0
@@ -161,18 +167,15 @@ class Game():
         self.nove_flag = False
         self.doze_flag = False
 
-    def parse_player_input(self):
+    def filter_input(self, player, mesa):
         s = input()
-        valid_inputs = ['1', '2', '3', 't', 'y', 'n', 'f', 'T', 'Y', 'N', 'F']
+        valid_inputs = ['1', '2', '3', 't', 'y', 'n', 'f', 
+                        'T', 'Y', 'N', 'F']
         if s in valid_inputs:
-            #print('valid input')
-            if (s == '1') or (s == '2') or (s == '3'):
-                return int(s)
-            else:
-                return s
-        else:
+            return s
+        #else:
             #print('invalid input')
-            raise InvalidInput
+            #raise InvalidInput
 
     def ask_truco(self):
         self.current_player.has_accepted = True
@@ -182,6 +185,13 @@ class Game():
         else:
             self.end_tento(self.current_player)
 
+    def play_card(self, player, mesa, other_players, card_index):
+        if self.beats(mesa, player.hand[card_index]):
+            for other_player in other_players:
+                other_player.is_winning = False
+            player.is_winning = True
+            self.winning_player = player
+        player.play_card(card_index, mesa)
 
 class Mesa(Stack):
     def __init__(self):
